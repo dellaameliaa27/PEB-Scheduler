@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#4f46e5"><meta name="apple-mobile-web-app-capable" content="yes">
+<title>PEB Planner</title>
+<style>
+:root{--bg:#f3f4fb;--card:#fff;--tx:#1b1f3b;--mu:#6b7194;--bd:#e4e6f2;--ac:#4f46e5;--g:linear-gradient(135deg,#4f46e5,#06b6d4);--red:#e5484d;--amb:#f5a623;--grn:#22b573;--sh:0 2px 10px rgba(40,40,100,.08);--lw:120px}
+@media(prefers-color-scheme:dark){:root{--bg:#0f1224;--card:#191d38;--tx:#eceefb;--mu:#9aa0c7;--bd:#2a2f55;--ac:#8b85ff;--sh:0 2px 10px rgba(0,0,0,.4)}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;font:15px/1.4 system-ui,-apple-system,Segoe UI,sans-serif;background:var(--bg);color:var(--tx);padding-bottom:calc(76px + env(safe-area-inset-bottom))}
+header{background:var(--g);color:#fff;padding:calc(12px + env(safe-area-inset-top)) 16px 12px;display:flex;align-items:center;gap:8px;position:sticky;top:0;z-index:20;box-shadow:var(--sh)}
+header h1{font-size:18px;margin:0;flex:1;line-height:1.1}header h1 small{display:block;font-size:11px;font-weight:400;opacity:.85}
+header button{background:rgba(255,255,255,.18);color:#fff;border:0;padding:8px 11px;border-radius:10px}
+button,select,input{font:inherit;color:inherit;border:1px solid var(--bd);border-radius:10px;padding:9px 11px;background:var(--card)}
+input,select{font-size:16px;width:100%;min-width:0}input[type=checkbox]{width:22px;height:22px;accent-color:var(--ac);padding:0;flex-shrink:0}
+button{cursor:pointer;min-height:40px}button.p{background:var(--g);color:#fff;border:0}
+main{max-width:1100px;margin:0 auto;padding:12px}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 12px;scrollbar-width:none}.chips::-webkit-scrollbar{display:none}
+.chip{flex-shrink:0;padding:8px 14px;border-radius:99px;background:var(--card);border:1px solid var(--bd);cursor:pointer;white-space:nowrap;font-size:14px}
+.chip.on{background:var(--g);color:#fff;border:0}.chip.add{color:var(--ac);border-style:dashed}
+.tabs{position:fixed;left:0;right:0;bottom:0;display:flex;background:var(--card);border-top:1px solid var(--bd);padding:6px 6px calc(6px + env(safe-area-inset-bottom));z-index:30}
+.tabs button{flex:1;border:0;background:none;display:flex;flex-direction:column;align-items:center;font-size:12px;color:var(--mu);gap:2px}
+.tabs button span{font-size:20px}.tabs button.on{color:var(--ac);font-weight:600}
+.card{background:var(--card);border-radius:16px;padding:14px;margin-bottom:12px;box-shadow:var(--sh)}
+.card h3{margin:0 0 10px;font-size:15px}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-bottom:12px}.cards .card{margin:0}
+.pc{cursor:pointer;transition:transform .15s}.pc:active{transform:scale(.98)}
+.pt{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}small{color:var(--mu);display:block;font-size:12px}
+.pm{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:12px 0 8px}.pm b{font-size:14px;display:block}
+.pg{height:6px;border-radius:9px;background:var(--bd);overflow:hidden}.pg i{display:block;height:100%;background:var(--g)}
+.nt{margin:8px 0 0;font-size:12px;color:var(--mu)}
+.b{display:inline-block;padding:3px 10px;border-radius:99px;color:#fff;font-size:12px;font-weight:600;white-space:nowrap}
+.red{background:var(--red)}.amb{background:var(--amb)}.grn{background:var(--grn)}.gry{background:var(--mu)}
+.fg{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px}
+label{font-size:12px;color:var(--mu);display:block}label input,label select{margin-top:4px;color:var(--tx)}
+.kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px}.kpi b{display:block;font-size:17px}.kpi span{font-size:12px;color:var(--mu)}
+.ph{border-left:5px solid var(--c);background:var(--bg);border-radius:12px;padding:10px;margin-bottom:10px}.ph.dn{opacity:.55}
+.r1{display:flex;gap:8px;align-items:center}.r2{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:8px 0}
+.r3{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--mu);gap:6px}.r3 button{padding:4px 12px;min-height:34px}
+.gs{overflow-x:auto;-webkit-overflow-scrolling:touch}.row{display:flex;height:32px;align-items:center}
+.lb{width:var(--lw);flex-shrink:0;position:sticky;left:0;background:var(--card);z-index:3;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-size:12px;padding-right:6px}
+.tr{position:relative;height:100%;border-bottom:1px solid var(--bd)}
+.sg{position:absolute;top:5px;height:22px;border-radius:7px;color:#fff;font-size:11px;line-height:22px;padding:0 6px;overflow:hidden;white-space:nowrap}.sg.done{opacity:.35}
+.ln{position:absolute;top:0;bottom:0;border-left:1px dashed var(--bd)}.td{border-left:2px solid var(--red);z-index:2}
+.ml{position:absolute;top:8px;font-size:11px;color:var(--mu);padding-left:3px}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.cal>div{background:var(--bg);border-radius:8px;min-height:62px;padding:3px;font-size:11px;overflow:hidden;cursor:pointer}
+.cal .h{min-height:0;text-align:center;color:var(--mu);background:none;cursor:default;font-size:11px}
+.cal .t{outline:2px solid var(--red)}.cal .o{opacity:.4}.cal .s{background:var(--ac);color:#fff}
+.ch{height:7px;margin-top:3px;border-radius:4px;font-size:0;color:#fff}
+.cm{display:flex;align-items:center;gap:8px;margin-bottom:10px}.cm b{flex:1;text-align:center}
+.dl{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--bd)}.dl i{width:12px;height:12px;border-radius:4px;flex-shrink:0}
+@media(min-width:701px){body{padding-bottom:20px}
+.tabs{position:static;border:0;background:none;padding:0;margin-bottom:12px;gap:6px;display:inline-flex}
+.tabs button{flex-direction:row;gap:6px;padding:8px 16px;border-radius:99px;background:var(--card);font-size:14px;flex:none}.tabs button.on{background:var(--g);color:#fff}.tabs button span{font-size:15px}
+.ch{height:15px;font-size:10px;line-height:15px;padding:0 3px;overflow:hidden;white-space:nowrap}.cal>div{min-height:90px}:root{--lw:160px}}
+@media print{header,.tabs,.chips{display:none}}
+@media(max-width:480px){header h1 small{display:none}header button{padding:8px;font-size:12px}}
+#rep{display:none}
+@media print{@page{size:A4 landscape;margin:12mm}body{background:#fff;padding:0}body>*:not(#rep){display:none!important}
+#rep{display:block;--card:#fff;--tx:#111;--mu:#666;--bd:#ddd;--bg:#fff;--lw:130px;color:#111;font-size:12px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+#rep h1{font-size:22px;margin:0 0 2px;color:#4f46e5}#rep h2{font-size:14px;margin:16px 0 6px}.rs{color:#666;font-size:11px;margin:4px 0 10px}
+#rep table{border-collapse:collapse;width:100%}#rep th,#rep td{border-bottom:1px solid #ddd;padding:5px 6px;text-align:left}#rep th{color:#666;font-weight:600}
+#rep .kpi{margin:8px 0}#rep .gs{overflow:visible}#rep tr,#rep .row{break-inside:avoid}.dot{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px}}
+</style></head><body>
+<header><h1>🏗️ PEB Planner<small>Backward scheduling for steel projects</small></h1>
+<button data-a="pdf">📄 PDF</button><button data-a="exp">Backup</button><button data-a="imp">Restore</button><input type="file" id="fi" accept=".json" hidden></header>
+<main id="main"></main>
+<script>
+const DAY=864e5,COL=['#4f46e5','#a855f7','#f97316','#22b573','#ec4899','#06b6d4','#64748b'];
+const pd=s=>Date.parse(s+'T00:00:00Z'),fmt=t=>new Date(t).toISOString().slice(0,10);
+const sh=t=>new Date(t).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'2-digit',timeZone:'UTC'});
+const today=pd(new Date().toLocaleDateString('sv'));
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const dd=x=>x.u==='w'?x.d*7:+x.d,mob=()=>innerWidth<700;
+let S;try{S=JSON.parse(localStorage.getItem('pebp'))}catch(e){}
+S=S||{sel:null,ps:[]};let T='port',M=new Date(today),ALL=false,SD=today;M.setUTCDate(1);
+const save=()=>localStorage.setItem('pebp',JSON.stringify(S)),P=()=>S.ps.find(p=>p.id===S.sel);
+function newP(){const p={id:''+Date.now(),name:'New Project',job:'',mode:'back',date:fmt(today+150*DAY),buffer:7,
+phases:[['Drawing Approval',2],['Shop Drawing',4],['Fabrication',6],['Delivery',2]].map(([n,d])=>({n,d,u:'w',ov:0,done:false}))};
+S.ps.push(p);S.sel=p.id;save()}
+function calc(p){const r=p.phases.map((x,i)=>({...x,i,c:COL[i%7]}));
+if(p.mode==='back'){let cur=pd(p.date)-p.buffer*DAY;for(let i=r.length-1;i>=0;i--){r[i].e=cur;r[i].s=cur-dd(r[i])*DAY;cur=r[i].s+(r[i].ov||0)*DAY}}
+else{let cur=pd(p.date);r.forEach((x,i)=>{x.s=i?cur-(x.ov||0)*DAY:cur;x.e=x.s+dd(x)*DAY;cur=x.e})}return r}
+const site=(p,c)=>p.mode==='back'?pd(p.date):(c.length?Math.max(...c.map(x=>x.e)):pd(p.date))+p.buffer*DAY;
+function st(p,c){if(!c.length)return['gry','–',''];const f=c[0],dn=c.filter(x=>x.done).length;
+if(dn===c.length)return['grn','Done','All phases completed'];
+const od=c.filter(x=>!x.done&&x.e<=today);
+if(od.length)return['red','Overdue','Past due: '+od.map(x=>x.n).join(', ')];
+if(!dn&&!f.done&&f.s<today)return['red','Start missed',`Should have started ${Math.round((today-f.s)/DAY)} days ago – compress durations or move the target`];
+const k=Math.round((f.s-today)/DAY);if(!dn&&k>=0&&k<=14)return['amb','Start soon',`Starts in ${k} days`];
+return['grn','On track',k>0?`Starts in ${k} days`:'In progress']}
+function gantt(rows,mn,mx,px){const W=(mx-mn)/DAY*px;let h='',g='';
+for(let t=mn;t<=mx;t+=DAY){const d=new Date(t);if(d.getUTCDate()===1)h+=`<div class="ml" style="left:${(t-mn)/DAY*px}px">${d.toLocaleDateString('en-US',{month:'short',year:'2-digit',timeZone:'UTC'})}</div>`;
+if(d.getUTCDay()===1)g+=`<div class="ln" style="left:${(t-mn)/DAY*px}px"></div>`}
+const tl=`<div class="ln td" style="left:${(today-mn)/DAY*px}px"></div>`;
+let o=`<div class="gs"><div style="min-width:calc(${W}px + var(--lw))"><div class="row"><div class="lb"></div><div class="tr" style="width:${W}px">${h}</div></div>`;
+rows.forEach(r=>o+=`<div class="row"><div class="lb">${esc(r.l)}</div><div class="tr" style="width:${W}px">${g}${tl}`+
+r.s.map(s=>`<div class="sg ${s.done?'done':''}" title="${esc(s.t)}" style="left:${(s.s-mn)/DAY*px}px;width:${Math.max(3,(s.e-s.s)/DAY*px)}px;background:${s.c}">${(s.e-s.s)/DAY*px>55?esc(s.n):''}</div>`).join('')+'</div></div>');
+return o+'</div></div>'}
+const segs=(p,c)=>{const s=c.map(x=>({s:x.s,e:x.e,c:x.c,n:x.n,done:x.done,t:`${x.n}: ${sh(x.s)} → ${sh(x.e-DAY)}`}));
+const a=Math.max(...c.map(x=>x.e)),b=site(p,c);if(b>a)s.push({s:a,e:b,c:'#94a3b8',n:'Buffer',t:'Buffer'});return s};
+function range(a){let x=today,y=today;a.forEach(s=>{x=Math.min(x,s.s);y=Math.max(y,s.e)});return[x-7*DAY,y+14*DAY]}
+function viewPort(){if(!S.ps.length)return'<div class="card">No projects yet. Tap <b>+ New</b>.</div>';
+const L=S.ps.map(p=>{const c=calc(p);return{p,c,s:st(p,c)}}).sort((a,b)=>(a.c[0]?.s||0)-(b.c[0]?.s||0));
+let o='<div class="cards">'+L.map(({p,c,s})=>{const dn=c.filter(x=>x.done).length;return`<div class="card pc" data-a="sel" data-id="${p.id}"><div class="pt"><div><b>${esc(p.name)}</b><small>${esc(p.job)||'No job no.'}</small></div><span class="b ${s[0]}">${s[1]}</span></div>
+<div class="pm"><div><small>Start</small><b>${c[0]?sh(c[0].s):'–'}</b></div><div><small>On site</small><b>${sh(site(p,c))}</b></div><div><small>Done</small><b>${dn}/${c.length}</b></div></div>
+<div class="pg"><i style="width:${c.length?dn/c.length*100:0}%"></i></div><p class="nt">${s[2]}</p></div>`}).join('')+'</div>';
+const all=L.flatMap(x=>segs(x.p,x.c)),[a,b]=range(all);
+return o+'<div class="card"><h3>All projects timeline <small style="display:inline">(red line = today)</small></h3>'+gantt(L.map(x=>({l:x.p.name,s:segs(x.p,x.c)})),a,b,mob()?2.5:3.5)+'</div>'}
+function viewProj(){const p=P();if(!p)return viewPort();const c=calc(p),s=st(p,c),f=c[0];
+const tot=c.length?Math.round((Math.max(...c.map(x=>x.e))-f.s)/DAY):0,act=c.find(x=>!x.done&&x.s<=today&&today<x.e);
+let o=`<div class="card"><div class="fg">
+<label>Project name<input data-f="name" value="${esc(p.name)}"></label>
+<label>Job no.<input data-f="job" value="${esc(p.job)}"></label>
+<label>Calculation mode<select data-f="mode"><option value="back" ${p.mode==='back'?'selected':''}>Backward from site arrival</option><option value="fwd" ${p.mode==='fwd'?'selected':''}>Forward from start date</option></select></label>
+<label>${p.mode==='back'?'Target arrival on site':'Start date'}<input type="date" data-f="date" value="${p.date}"></label>
+<label>Buffer (days)<input type="number" inputmode="numeric" min="0" data-f="buffer" value="${p.buffer}"></label></div></div>
+<div class="card kpi"><div><span class="b ${s[0]}">${s[1]}</span><span style="display:block;margin-top:4px">${s[2]}</span></div>
+<div><b>${f?sh(f.s):'–'}</b><span>${p.mode==='back'?'Latest start':'Start'}</span></div><div><b>${sh(site(p,c))}</b><span>Arrival on site</span></div>
+<div><b>${(tot/7).toFixed(1)} wks</b><span>Total duration</span></div><div><b>${act?esc(act.n):'–'}</b><span>Current phase</span></div></div>
+<div class="card"><h3>Phases</h3>`;
+c.forEach((x,i)=>o+=`<div class="ph ${x.done?'dn':''}" style="--c:${x.c}"><div class="r1"><input type="checkbox" data-i="${i}" data-k="done" ${x.done?'checked':''}><input data-i="${i}" data-k="n" value="${esc(x.n)}"><button data-a="rm" data-i="${i}">✕</button></div>
+<div class="r2"><label>Duration<input type="number" inputmode="decimal" min="0" data-i="${i}" data-k="d" value="${x.d}"></label>
+<label>Unit<select data-i="${i}" data-k="u"><option value="w" ${x.u==='w'?'selected':''}>weeks</option><option value="d" ${x.u==='d'?'selected':''}>days</option></select></label>
+<label>Overlap (d)<input type="number" inputmode="numeric" min="0" data-i="${i}" data-k="ov" value="${x.ov||0}" ${i?'':'disabled'}></label></div>
+<div class="r3"><span>📅 ${sh(x.s)} → ${sh(x.e-DAY)}</span><span><button data-a="up" data-i="${i}">↑</button> <button data-a="dn" data-i="${i}">↓</button></span></div></div>`);
+o+=`<button data-a="add" class="p">+ Add phase</button> <button data-a="pdf">📄 Export PDF</button> <button data-a="dup">Duplicate</button> <button data-a="delp" style="color:var(--red)">Delete project</button></div>`;
+const sg=segs(p,c),[a,b]=range(sg);
+return o+'<div class="card"><h3>Gantt</h3>'+gantt(c.map(x=>({l:x.n,s:[sg[x.i]]})),a,b,mob()?5:7)+'</div>'}
+function viewCal(){const rows=(ALL?S.ps:[P()].filter(Boolean)).flatMap(p=>{const c=calc(p);return segs(p,c).filter(x=>x.n!=='Buffer').map(x=>({...x,pn:p.name}))});
+const y=M.getUTCFullYear(),m=M.getUTCMonth(),first=Date.UTC(y,m,1),start=first-((new Date(first).getUTCDay()+6)%7)*DAY;
+let o=`<div class="card"><div class="cm"><button data-a="pm">◀</button><b>${new Date(first).toLocaleDateString('en-US',{month:'long',year:'numeric',timeZone:'UTC'})}</b><button data-a="tdy">Today</button><button data-a="nm">▶</button></div>
+<label style="margin-bottom:10px;display:flex;gap:8px;align-items:center"><input type="checkbox" id="all" ${ALL?'checked':''}> Show all projects</label><div class="cal">`+['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(d=>`<div class="h">${d}</div>`).join('');
+for(let i=0;i<42;i++){const t=start+i*DAY,d=new Date(t);
+const ch=rows.filter(x=>t>=x.s&&t<x.e).map(x=>`<div class="ch" style="background:${x.c};opacity:${x.done?.4:1}">${t===x.s||d.getUTCDay()===1?esc((ALL?x.pn+': ':'')+x.n):''}</div>`).join('');
+o+=`<div data-a="day" data-t="${t}" class="${t===today?'t':''} ${d.getUTCMonth()!==m?'o':''} ${t===SD?'s':''}"><b>${d.getUTCDate()}</b>${ch}</div>`}
+const act=rows.filter(x=>SD>=x.s&&SD<x.e);
+return o+`</div></div><div class="card"><h3>${sh(SD)}</h3>`+(act.length?act.map(x=>`<div class="dl"><i style="background:${x.c}"></i><div><b>${esc(x.n)}</b><small>${ALL?esc(x.pn)+' · ':''}${sh(x.s)} → ${sh(x.e-DAY)}${x.done?' · done':''}</small></div></div>`).join(''):'<small>No phases active on this day.</small>')+'</div>'}
+function report(){const all=T==='port'||!P(),gen=sh(today),bd=s=>`<span class="b ${s[0]}">${s[1]}</span>`;let h,ttl;
+if(all){const L=S.ps.map(p=>{const c=calc(p);return{p,c,s:st(p,c)}}).sort((a,b)=>(a.c[0]?.s||0)-(b.c[0]?.s||0));
+const [a,b]=range(L.flatMap(x=>segs(x.p,x.c))),px=Math.min(6,720/((b-a)/DAY));ttl='PEB Schedule Summary';
+h=`<h1>${ttl}</h1><p class="rs">Generated ${gen}</p><table><tr><th>Project</th><th>Job no.</th><th>Start</th><th>On site</th><th>Done</th><th>Status</th></tr>`+
+L.map(({p,c,s})=>`<tr><td><b>${esc(p.name)}</b></td><td>${esc(p.job)}</td><td>${c[0]?sh(c[0].s):'–'}</td><td>${sh(site(p,c))}</td><td>${c.filter(x=>x.done).length}/${c.length}</td><td>${bd(s)}</td></tr>`).join('')+
+'</table><h2>Timeline</h2>'+gantt(L.map(x=>({l:x.p.name,s:segs(x.p,x.c)})),a,b,px)}
+else{const p=P(),c=calc(p),s=st(p,c),f=c[0],sg=segs(p,c),[a,b]=range(sg),px=Math.min(8,720/((b-a)/DAY));
+ttl=p.name+(p.job?' ('+p.job+')':'')+' - Schedule';
+const ps=x=>x.done?'Done':x.e<=today?'Overdue':x.s<=today?'In progress':'Upcoming';
+h=`<h1>${esc(p.name)}</h1><p class="rs">${p.job?'Job '+esc(p.job)+' · ':''}Generated ${gen}</p>
+<div class="kpi"><div>${bd(s)}<span style="display:block;margin-top:3px">Status</span></div><div><b>${f?sh(f.s):'–'}</b><span>${p.mode==='back'?'Latest start':'Start'}</span></div><div><b>${sh(site(p,c))}</b><span>Arrival on site</span></div><div><b>${c.length?((Math.max(...c.map(x=>x.e))-f.s)/DAY/7).toFixed(1):0} wks</b><span>Total duration</span></div></div>
+<h2>Phases</h2><table><tr><th>#</th><th>Phase</th><th>Duration</th><th>Start</th><th>Finish</th><th>Status</th></tr>`+
+c.map((x,i)=>`<tr><td>${i+1}</td><td><span class="dot" style="background:${x.c}"></span>${esc(x.n)}</td><td>${x.d} ${x.u==='w'?'wk':'d'}${x.ov?' (overlap '+x.ov+'d)':''}</td><td>${sh(x.s)}</td><td>${sh(x.e-DAY)}</td><td>${ps(x)}</td></tr>`).join('')+
+(p.buffer>0?`<tr><td></td><td><span class="dot" style="background:#94a3b8"></span>Buffer</td><td>${p.buffer} d</td><td colspan="3"></td></tr>`:'')+
+'</table><h2>Timeline</h2>'+gantt(c.map(x=>({l:x.n,s:[sg[x.i]]})),a,b,px)}
+let r=document.getElementById('rep');if(!r){r=document.createElement('div');r.id='rep';document.body.appendChild(r)}
+r.innerHTML=h+'<p class="rs" style="margin-top:14px">Planned schedule based on the durations above; actual dates depend on approval timing. Generated by PEB Planner.</p>';
+const old=document.title;document.title=ttl.replace(/[^\w ().-]/g,'')+' '+fmt(today);
+window.onafterprint=()=>{document.title=old};setTimeout(()=>print(),60)}
+function R(){const tabs=[['port','📊','Portfolio'],['proj','📝','Project'],['cal','📅','Calendar']];
+document.getElementById('main').innerHTML='<div class="chips">'+S.ps.map(x=>`<div class="chip ${x.id===S.sel?'on':''}" data-a="sel" data-id="${x.id}" data-stay="1">${esc(x.name)}</div>`).join('')+'<div class="chip add" data-a="newp">+ New</div></div>'+
+'<nav class="tabs">'+tabs.map(([k,i,n])=>`<button class="${T===k?'on':''}" data-a="tab" data-id="${k}"><span>${i}</span>${n}</button>`).join('')+'</nav>'+
+(T==='port'?viewPort():T==='proj'?viewProj():viewCal())}
+document.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(!t)return;const a=t.dataset.a,i=+t.dataset.i,p=P();
+if(a==='tab')T=t.dataset.id;
+else if(a==='sel'){S.sel=t.dataset.id;if(T==='port'&&!t.dataset.stay)T='proj'}
+else if(a==='newp'){newP();T='proj'}
+else if(a==='delp'){if(confirm('Delete this project?')){S.ps=S.ps.filter(x=>x!==p);S.sel=S.ps[0]?.id||null;T='port'}}
+else if(a==='dup'){const q=JSON.parse(JSON.stringify(p));q.id=''+Date.now();q.name+=' (copy)';S.ps.push(q);S.sel=q.id}
+else if(a==='add')p.phases.push({n:'New phase',d:1,u:'w',ov:0,done:false});
+else if(a==='rm')p.phases.splice(i,1);
+else if(a==='up'&&i>0)[p.phases[i-1],p.phases[i]]=[p.phases[i],p.phases[i-1]];
+else if(a==='dn'&&i<p.phases.length-1)[p.phases[i+1],p.phases[i]]=[p.phases[i],p.phases[i+1]];
+else if(a==='pm')M.setUTCMonth(M.getUTCMonth()-1);else if(a==='nm')M.setUTCMonth(M.getUTCMonth()+1);
+else if(a==='tdy'){M=new Date(today);M.setUTCDate(1);SD=today}
+else if(a==='day')SD=+t.dataset.t;
+else if(a==='pdf')return report();
+else if(a==='imp')return document.getElementById('fi').click();
+else if(a==='exp'){const l=document.createElement('a');l.href=URL.createObjectURL(new Blob([JSON.stringify(S,null,1)],{type:'application/json'}));l.download='peb-planner-'+fmt(today)+'.json';l.click();return}
+save();R()});
+document.addEventListener('change',e=>{const t=e.target,p=P();
+if(t.id==='all')ALL=t.checked;
+else if(t.dataset.f)p[t.dataset.f]=t.type==='number'?+t.value:t.value;
+else if(t.dataset.k){const x=p.phases[+t.dataset.i],k=t.dataset.k;x[k]=t.type==='checkbox'?t.checked:t.type==='number'?+t.value:t.value}
+else if(t.id==='fi'){const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);if(!Array.isArray(d.ps))throw 0;if(confirm('Replace all data with this file?')){S=d;save();R()}}catch(_){alert('Invalid file')}};r.readAsText(t.files[0]);return}
+else return;save();R()});
+addEventListener('resize',()=>{clearTimeout(window._r);window._r=setTimeout(R,200)});
+if(!S.ps.length)newP(),T='port';R();
+</script></body></html>
